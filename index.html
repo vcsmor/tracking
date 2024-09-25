@@ -15,29 +15,26 @@
     <script>
         document.getElementById('trackButton').onclick = function() {
             const inputId = document.getElementById('trackingIdInput').value.trim();
-            const url = 'https://script.google.com/macros/s/AKfycbw2nCYkmk-E27m3jJuC26F_NnzlJD3MzRmbU6pR7mXmpYbZlH2T7WcTsh_bHkAReYajow/exec'; // Replace with your web app URL
+            const url = 'https://script.google.com/macros/s/AKfycbwaNb2OsYpLmQ_pp19BuIc1UZHoGIgj64HrzW1W13bSFZf82MgaVANCPWRnusqh74SVcg/exec'; // Replace with your actual web app URL
 
-            fetch(url)
-                .then(response => {
-                    console.log('Response status:', response.status); // Log the response status
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Fetched data:', data); // Log the fetched data
-                    const result = data.find(entry => entry['Tracking ID'] === inputId); // Ensure the header matches your sheet
-                    if (result) {
-                        document.getElementById('trackingResult').innerHTML = `Status: ${result['Status']}`; // Ensure the header matches your sheet
-                        document.getElementById('comments').innerHTML = `Comments: ${result['Comments'] || 'No comments available'}`; // Ensure the header matches your sheet
-                    } else {
-                        document.getElementById('trackingResult').innerHTML = 'Tracking ID not found.';
-                        document.getElementById('comments').innerHTML = '';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching data:', error);
-                    document.getElementById('trackingResult').innerHTML = 'Error retrieving data.';
-                    document.getElementById('comments').innerHTML = '';
-                });
+            // Create a JSONP request
+            const script = document.createElement('script');
+            script.src = `${url}?callback=handleResponse`; // Append the callback parameter to the URL
+            document.body.appendChild(script);
+        }
+
+        // This function will be called when the data is returned from the Google Apps Script
+        function handleResponse(data) {
+            const inputId = document.getElementById('trackingIdInput').value.trim();
+            const result = data.find(entry => entry['Tracking ID'] === inputId); // Adjust based on your headers
+            
+            if (result) {
+                document.getElementById('trackingResult').innerHTML = `Status: ${result['Status']}`; // Adjust based on your headers
+                document.getElementById('comments').innerHTML = `Comments: ${result['Comments'] || 'No comments available'}`; // Adjust based on your headers
+            } else {
+                document.getElementById('trackingResult').innerHTML = 'Tracking ID not found.';
+                document.getElementById('comments').innerHTML = '';
+            }
         }
     </script>
 </body>
