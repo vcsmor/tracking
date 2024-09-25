@@ -37,6 +37,7 @@
                     const responseData = rows.slice(1).map(row => {
                         const entry = {};
                         headers.forEach((header, index) => {
+                            // Ensure we don't access an undefined value
                             entry[header] = row[index] ? row[index].trim() : ''; // Handle empty cells
                         });
                         return entry;
