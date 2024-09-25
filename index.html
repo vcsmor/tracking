@@ -8,96 +8,32 @@
 <body>
     <h1>Shipment Tracking</h1>
     <input type="text" id="trackingIdInput" placeholder="Enter Tracking ID">
-    <button onclick="getTrackingStatus()">Track</button>
-    
-    <div id="trackingResult"></div>
-    
-    <div id="survey" style="display: none;">
-        <h2>Rate your delivery experience</h2>
-        <label for="experience">On a scale of 1-10, how was the delivery?</label>
-        <select id="experience">
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-            <option value="7">7</option>
-            <option value="8">8</option>
-            <option value="9">9</option>
-            <option value="10">10</option>
-        </select>
-        <button onclick="submitSurvey()">Submit Survey</button>
-        <div id="surveyResult"></div>
-    </div>
+    <button id="trackButton">Track</button>
+    <p id="trackingResult"></p>
+    <p id="comments"></p>
 
     <script>
-        const sheetId = '1dgiJYDErHtepcAHOFnrFFXPvRIPq8K0QCwkcAefK1n0'; // Replace with your actual Google Sheet ID
-        const base = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?`;
-        const query = encodeURIComponent('SELECT A, B'); // Columns: A for Tracking ID, B for Status
-        const url = `${base}&tq=${query}`;
-        let trackingData = [];
-
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbxy-gmqc3my6lcIcNd61kDJDrzASi7fgntL1dgPsWyPkRyGWwZ_Qa089oxTotweqwnNNw/exec'; // Replace with your Apps Script Web App URL
-
-        // Fetch the data from Google Sheets when the page loads
-        fetch(url)
-            .then(res => res.text())
-            .then(rep => {
-                const json = JSON.parse(rep.substr(47).slice(0,-2));
-                const rows = json.table.rows;
-                trackingData = rows.map(row => ({
-                    id: row.c[0].v,       // Tracking ID
-                    status: row.c[1].v    // Status
-                }));
-            })
-            .catch(err => console.error('Error fetching data', err));
-
-        function getTrackingStatus() {
+        document.getElementById('trackButton').onclick = function() {
             const inputId = document.getElementById('trackingIdInput').value.trim();
-            const result = trackingData.find(entry => entry.id === inputId);
+            const url = 'https://script.google.com/macros/s/AKfycbwaNb2OsYpLmQ_pp19BuIc1UZHoGIgj64HrzW1W13bSFZf82MgaVANCPWRnusqh74SVcg/exec'; // Replace with your web app URL
 
-            if (result) {
-                document.getElementById('trackingResult').innerHTML = `Status: ${result.status}`;
-
-                // Show survey if the status is 'Processed'
-                if (result.status.toLowerCase() === 'processed') {
-                    document.getElementById('survey').style.display = 'block';
-                } else {
-                    document.getElementById('survey').style.display = 'none';
-                }
-            } else {
-                document.getElementById('trackingResult').innerHTML = 'Tracking ID not found.';
-                document.getElementById('survey').style.display = 'none'; // Hide the survey
-            }
-        }
-
-        function submitSurvey() {
-            const experienceRating = document.getElementById('experience').value;
-            const trackingId = document.getElementById('trackingIdInput').value.trim();
-            
-            fetch(scriptURL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    trackingId: trackingId,
-                    surveyResponse: `Rated: ${experienceRating}/10`
-                }),
-            })
-            .then(response => response.json())
-            .then(response => {
-                if (response.status === 'success') {
-                    document.getElementById('surveyResult').innerHTML = `Thank you! You rated the delivery a ${experienceRating}/10.`;
-                } else {
-                    document.getElementById('surveyResult').innerHTML = `Error: ${response.message}`;
-                }
-            })
-            .catch(error => {
-                document.getElementById('surveyResult').innerHTML = 'There was an error submitting the survey.';
-                console.error('Error:', error);
-            });
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    const result = data.find(entry => entry['Tracking ID'] === inputId); // Adjust based on your headers
+                    if (result) {
+                        document.getElementById('trackingResult').innerHTML = `Status: ${result['Status']}`; // Adjust based on your headers
+                        document.getElementById('comments').innerHTML = `Comments: ${result['Comments'] || 'No comments available'}`; // Adjust based on your headers
+                    } else {
+                        document.getElementById('trackingResult').innerHTML = 'Tracking ID not found.';
+                        document.getElementById('comments').innerHTML = '';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                    document.getElementById('trackingResult').innerHTML = 'Error retrieving data.';
+                    document.getElementById('comments').innerHTML = '';
+                });
         }
     </script>
 </body>
