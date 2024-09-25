@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shipment Tracking</title>
+</head>
+<body>
+    <h1>Shipment Tracking</h1>
+    <input type="text" id="trackingIdInput" placeholder="Enter Tracking ID">
+    <button onclick="getTrackingStatus()">Track</button>
+    <div id="trackingResult"></div>
+    <div id="trackingTable"></div>
+
+    <script>
+        const sheetId = '1dgiJYDErHtepcAHOFnrFFXPvRIPq8K0QCwkcAefK1n0'; // Replace with your sheet ID
+        const base = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?`;
+        const query = encodeURIComponent('SELECT A, B'); // Columns for Tracking ID and Status
+        const url = `${base}&tq=${query}`;
+
+        fetch(url)
+          .then(res => res.text())
+          .then(rep => {
+              const json = JSON.parse(rep.substr(47).slice(0,-2));
+              const rows = json.table.rows;
+              let output = '<table><tr><th>Tracking ID</th><th>Status</th></tr>';
+              rows.forEach((row) => {
+                  output += `<tr><td>${row.c[0].v}</td><td>${row.c[1].v}</td></tr>`;
+              });
+              output += '</table>';
+              document.getElementById('trackingTable').innerHTML = output;
+          })
+          .catch(err => console.error('Error fetching data', err));
+
+        function getTrackingStatus() {
+            const inputId = document.getElementById('trackingIdInput').value;
+            let result = "Tracking ID not found.";
+            const rows = document.querySelectorAll('#trackingTable tr');
+            rows.forEach((row) => {
+                const trackingId = row.cells[0]?.textContent;
+                const status = row.cells[1]?.textContent;
+                if (trackingId === inputId) {
+                    result = `Status: ${status}`;
+                }
+            });
+            document.getElementById('trackingResult').innerHTML = result;
+        }
+    </script>
+</body>
+</html>
