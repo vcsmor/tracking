@@ -15,28 +15,19 @@
     <script>
         document.getElementById('trackButton').onclick = function() {
             const inputId = document.getElementById('trackingIdInput').value.trim();
-            const url = 'https://script.google.com/macros/s/AKfycbxoFCDJ6pTO13dG3xoDDtpx0lfKSHjk-dwqjx7MYGVcP1Ni6UyP6gL86Y9nJrJfkPDpoA/exec'; // Replace with your actual web app URL
+            const url = 'https://raw.githubusercontent.com/<your-username>/<repository-name>/main/<your-file-name>.csv'; // Replace with your actual CSV file URL
 
-            // Create a JSONP request
-            const script = document.createElement('script');
-            script.src = `${url}?callback=handleResponse`; // Append the callback parameter to the URL
-            document.body.appendChild(script);
-        }
-
-        // This function will be called when the data is returned from the Google Apps Script
-        function handleResponse(data) {
-            console.log('Data received:', data); // Log the entire data for inspection
-            const inputId = document.getElementById('trackingIdInput').value.trim();
-            const result = data.find(entry => entry['Tracking ID'] === inputId); // Adjust based on your headers
-            
-            if (result) {
-                document.getElementById('trackingResult').innerHTML = `Status: ${result['Status']}`; // Adjust based on your headers
-                document.getElementById('comments').innerHTML = `Comments: ${result['Comments'] || 'No comments available'}`; // Adjust based on your headers
-            } else {
-                document.getElementById('trackingResult').innerHTML = 'Tracking ID not found.';
-                document.getElementById('comments').innerHTML = '';
-            }
-        }
-    </script>
-</body>
-</html>
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.text();
+                })
+                .then(data => {
+                    const rows = data.split('\n').map(row => row.split(','));
+                    const headers = rows[0].map(header => header.trim());
+                    const responseData = rows.slice(1).map(row => {
+                        const entry = {};
+                        headers.forEach((header, index) => {
+                            entry[header] = row[index].trim()
