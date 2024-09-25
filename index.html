@@ -18,12 +18,16 @@
             const url = 'https://script.google.com/macros/s/AKfycbwaNb2OsYpLmQ_pp19BuIc1UZHoGIgj64HrzW1W13bSFZf82MgaVANCPWRnusqh74SVcg/exec'; // Replace with your web app URL
 
             fetch(url)
-                .then(response => response.json())
+                .then(response => {
+                    console.log('Response status:', response.status); // Log the response status
+                    return response.json();
+                })
                 .then(data => {
-                    const result = data.find(entry => entry['Tracking ID'] === inputId); // Adjust based on your headers
+                    console.log('Fetched data:', data); // Log the fetched data
+                    const result = data.find(entry => entry['Tracking ID'] === inputId); // Ensure the header matches your sheet
                     if (result) {
-                        document.getElementById('trackingResult').innerHTML = `Status: ${result['Status']}`; // Adjust based on your headers
-                        document.getElementById('comments').innerHTML = `Comments: ${result['Comments'] || 'No comments available'}`; // Adjust based on your headers
+                        document.getElementById('trackingResult').innerHTML = `Status: ${result['Status']}`; // Ensure the header matches your sheet
+                        document.getElementById('comments').innerHTML = `Comments: ${result['Comments'] || 'No comments available'}`; // Ensure the header matches your sheet
                     } else {
                         document.getElementById('trackingResult').innerHTML = 'Tracking ID not found.';
                         document.getElementById('comments').innerHTML = '';
