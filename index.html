@@ -25,6 +25,7 @@
 
         // This function will be called when the data is returned from the Google Apps Script
         function handleResponse(data) {
+            console.log('Data received:', data); // Log the entire data for inspection
             const inputId = document.getElementById('trackingIdInput').value.trim();
             const result = data.find(entry => entry['Tracking ID'] === inputId); // Adjust based on your headers
             
