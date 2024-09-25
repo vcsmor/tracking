@@ -10,11 +10,19 @@
     <input type="text" id="trackingIdInput" placeholder="Enter Tracking ID">
     <button onclick="getTrackingStatus()">Track</button>
     <div id="trackingResult"></div>
+    <div id="commentSection"></div>
+    <div id="surveySection" style="display:none;">
+        <h3>Rate Your Delivery Experience</h3>
+        <label for="experienceRating">Rate from 1 to 10:</label>
+        <input type="number" id="experienceRating" min="1" max="10" value="5">
+        <button onclick="submitSurvey()">Submit</button>
+        <p id="surveyMessage"></p>
+    </div>
 
     <script>
         const sheetId = '1dgiJYDErHtepcAHOFnrFFXPvRIPq8K0QCwkcAefK1n0'; // Replace with your actual Google Sheet ID
         const base = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?`;
-        const query = encodeURIComponent('SELECT A, B'); // Adjust to fetch Tracking ID (A) and Status (B)
+        const query = encodeURIComponent('SELECT A, B, C'); // Adjust to fetch Tracking ID (A), Status (B), and Comment (C)
         const url = `${base}&tq=${query}`;
         let trackingData = [];
 
@@ -25,22 +33,12 @@
                 const json = JSON.parse(rep.substr(47).slice(0,-2));
                 const rows = json.table.rows;
                 trackingData = rows.map(row => ({
-                    id: row.c[0].v,   // Tracking ID
-                    status: row.c[1].v // Status
+                    id: row.c[0].v,      // Tracking ID
+                    status: row.c[1].v,  // Status
+                    comment: row.c[2] ? row.c[2].v : '' // Comment (if available)
                 }));
             })
             .catch(err => console.error('Error fetching data', err));
 
         function getTrackingStatus() {
-            const inputId = document.getElementById('trackingIdInput').value.trim();
-            const result = trackingData.find(entry => entry.id === inputId);
-
-            if (result) {
-                document.getElementById('trackingResult').innerHTML = `Status: ${result.status}`;
-            } else {
-                document.getElementById('trackingResult').innerHTML = 'Tracking ID not found.';
-            }
-        }
-    </script>
-</body>
-</html>
+            const inputId = document.get
