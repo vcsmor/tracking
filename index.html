@@ -17,26 +17,36 @@
             const inputId = document.getElementById('trackingIdInput').value.trim();
             const url = 'https://raw.githubusercontent.com/vcsmor/tracking/main/CSVGithub.csv'; // Ensure this is the correct CSV file URL
 
+            console.log('Fetching data from:', url); // Log the URL
+
             fetch(url)
                 .then(response => {
+                    console.log('Response status:', response.status); // Log the response status
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
                     }
                     return response.text();
                 })
                 .then(data => {
+                    console.log('Data fetched:', data); // Log the raw CSV data
+
                     const rows = data.split('\n').map(row => row.split(','));
                     const headers = rows[0].map(header => header.trim());
+                    console.log('Parsed Headers:', headers); // Log the headers
+
                     const responseData = rows.slice(1).map(row => {
                         const entry = {};
                         headers.forEach((header, index) => {
-                            entry[header] = row[index].trim();
+                            entry[header] = row[index] ? row[index].trim() : ''; // Handle empty cells
                         });
                         return entry;
                     });
 
+                    console.log('Parsed responseData:', responseData); // Log parsed data
+
                     // Find the result for the input ID
                     const result = responseData.find(entry => entry['Tracking ID'] === inputId); // Ensure 'Tracking ID' matches your CSV header
+                    console.log('Search Result:', result); // Log the search result
 
                     if (result) {
                         document.getElementById('trackingResult').innerHTML = `Status: ${result['Status']}`; // Adjust based on your headers
