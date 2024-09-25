@@ -20,7 +20,7 @@
             fetch(url)
                 .then(response => response.json())
                 .then(data => {
-                    const result = data.find(entry => entry['Tracking ID'] === 1); // Adjust based on your headers
+                    const result = data.find(entry => entry['Tracking ID'] === inputId); // Adjust based on your headers
                     if (result) {
                         document.getElementById('trackingResult').innerHTML = `Status: ${result['Status']}`; // Adjust based on your headers
                         document.getElementById('comments').innerHTML = `Comments: ${result['Comments'] || 'No comments available'}`; // Adjust based on your headers
