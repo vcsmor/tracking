@@ -10,40 +10,36 @@
     <input type="text" id="trackingIdInput" placeholder="Enter Tracking ID">
     <button onclick="getTrackingStatus()">Track</button>
     <div id="trackingResult"></div>
-    <div id="trackingTable"></div>
 
     <script>
-        const sheetId = '1dgiJYDErHtepcAHOFnrFFXPvRIPq8K0QCwkcAefK1n0'; // Replace with your sheet ID
+        const sheetId = '1dgiJYDErHtepcAHOFnrFFXPvRIPq8K0QCwkcAefK1n0'; // Replace with your actual Google Sheet ID
         const base = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?`;
-        const query = encodeURIComponent('SELECT A, B'); // Columns for Tracking ID and Status
+        const query = encodeURIComponent('SELECT A, B'); // Adjust to fetch Tracking ID (A) and Status (B)
         const url = `${base}&tq=${query}`;
+        let trackingData = [];
 
+        // Fetch the data from Google Sheets when the page loads
         fetch(url)
-          .then(res => res.text())
-          .then(rep => {
-              const json = JSON.parse(rep.substr(47).slice(0,-2));
-              const rows = json.table.rows;
-              let output = '<table><tr><th>Tracking ID</th><th>Status</th></tr>';
-              rows.forEach((row) => {
-                  output += `<tr><td>${row.c[0].v}</td><td>${row.c[1].v}</td></tr>`;
-              });
-              output += '</table>';
-              document.getElementById('trackingTable').innerHTML = output;
-          })
-          .catch(err => console.error('Error fetching data', err));
+            .then(res => res.text())
+            .then(rep => {
+                const json = JSON.parse(rep.substr(47).slice(0,-2));
+                const rows = json.table.rows;
+                trackingData = rows.map(row => ({
+                    id: row.c[0].v,   // Tracking ID
+                    status: row.c[1].v // Status
+                }));
+            })
+            .catch(err => console.error('Error fetching data', err));
 
         function getTrackingStatus() {
-            const inputId = document.getElementById('trackingIdInput').value;
-            let result = "Tracking ID not found.";
-            const rows = document.querySelectorAll('#trackingTable tr');
-            rows.forEach((row) => {
-                const trackingId = row.cells[0]?.textContent;
-                const status = row.cells[1]?.textContent;
-                if (trackingId === inputId) {
-                    result = `Status: ${status}`;
-                }
-            });
-            document.getElementById('trackingResult').innerHTML = result;
+            const inputId = document.getElementById('trackingIdInput').value.trim();
+            const result = trackingData.find(entry => entry.id === inputId);
+
+            if (result) {
+                document.getElementById('trackingResult').innerHTML = `Status: ${result.status}`;
+            } else {
+                document.getElementById('trackingResult').innerHTML = 'Tracking ID not found.';
+            }
         }
     </script>
 </body>
