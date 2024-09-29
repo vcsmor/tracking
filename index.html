@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width" content="initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shipment Tracking</title>
 </head>
 <body>
@@ -10,7 +10,9 @@
     <input type="text" id="trackingIdInput" placeholder="Enter Tracking ID">
     <button id="trackButton">Track</button>
     <p id="trackingResult"></p>
+    <p id="deliveryDate"></p>
     <p id="comments"></p>
+    <p id="lastUpdated"></p>
 
     <script>
         document.getElementById('trackButton').onclick = function() {
@@ -25,6 +27,16 @@
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
                     }
+
+                    // Get the Last-Modified date from the response headers
+                    const lastModified = response.headers.get('Last-Modified');
+                    const lastUpdatedElement = document.getElementById('lastUpdated');
+                    if (lastModified) {
+                        lastUpdatedElement.innerHTML = `Last Updated: ${new Date(lastModified).toLocaleString()}`;
+                    } else {
+                        lastUpdatedElement.innerHTML = 'Last Updated: No information available';
+                    }
+
                     return response.text();
                 })
                 .then(data => {
@@ -49,19 +61,22 @@
                     console.log('Search Result:', result); // Log the search result
 
                     if (result) {
-                        document.getElementById('trackingResult').innerHTML = `Status: ${result['Status']}`; // Adjust based on your headers
-                        // Check if there are comments; display only if they exist
+                        document.getElementById('trackingResult').innerHTML = `Status: ${result['Status']}`;
+                        document.getElementById('deliveryDate').innerHTML = `Delivery Date: ${result['Delivery Date'] || 'Not available'}`; // Display delivery date
                         const commentText = result['Comments'] ? result['Comments'] : 'No comments available';
-                        document.getElementById('comments').innerHTML = `Comments: ${commentText}`; // Adjust based on your headers
+                        document.getElementById('comments').innerHTML = `Comments: ${commentText}`;
                     } else {
                         document.getElementById('trackingResult').innerHTML = 'Tracking ID not found.';
-                        document.getElementById('comments').innerHTML = ''; // Clear comments if ID is not found
+                        document.getElementById('deliveryDate').innerHTML = '';
+                        document.getElementById('comments').innerHTML = '';
                     }
                 })
                 .catch(error => {
                     console.error('Error fetching data:', error);
                     document.getElementById('trackingResult').innerHTML = 'Error retrieving data.';
                     document.getElementById('comments').innerHTML = '';
+                    document.getElementById('deliveryDate').innerHTML = '';
+                    document.getElementById('lastUpdated').innerHTML = '';
                 });
         }
     </script>
