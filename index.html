@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width" content="initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shipment Tracking</title>
 </head>
 <body>
@@ -67,7 +67,7 @@
                     const lastUpdatedIndex = headers.indexOf('Last Updated');
                     if (lastUpdatedIndex !== -1 && rows[1][lastUpdatedIndex]) {
                         const lastUpdated = rows[1][lastUpdatedIndex].trim(); // Get the value from the second row (data row)
-                        document.getElementById('lastUpdated').innerHTML = lastUpdated; // Show only the value, no need to add "Last Updated: " again
+                        document.getElementById('lastUpdated').innerHTML = lastUpdated; // Show only the date and time
                     } else {
                         document.getElementById('lastUpdated').innerHTML = 'No information available';
                     }
