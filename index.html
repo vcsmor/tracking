@@ -63,11 +63,10 @@
                         document.getElementById('comments').innerHTML = ''; // Clear Comments if not found
                     }
 
-                    // Fetch the "Last Updated" value from the first data row
-                    const lastUpdatedIndex = headers.indexOf('Last Updated');
-                    if (lastUpdatedIndex !== -1 && rows[1][lastUpdatedIndex]) {
-                        const lastUpdated = rows[1][lastUpdatedIndex].trim(); // Get the value from the second row (data row)
-                        document.getElementById('lastUpdated').innerHTML = lastUpdated; // Show only the date and time
+                    // Fetch the "Last Updated" value from the first row (E2) and display it
+                    const lastUpdated = rows[1][headers.indexOf('Last Updated')]; // Adjust for column name
+                    if (lastUpdated) {
+                        document.getElementById('lastUpdated').innerHTML = `Last Updated: ${lastUpdated}`;
                     } else {
                         document.getElementById('lastUpdated').innerHTML = 'No information available';
                     }
