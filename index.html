@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width" content="initial-scale=1.0">
     <title>Shipment Tracking</title>
 </head>
 <body>
@@ -66,7 +66,7 @@
                     // Fetch the "Last Updated" value from the first row (E2) and display it
                     const lastUpdated = rows[1][headers.indexOf('Last Updated')]; // Adjust for column name
                     if (lastUpdated) {
-                        document.getElementById('lastUpdated').innerHTML = ` ${lastUpdated}`;
+                        document.getElementById('lastUpdated').innerHTML = `Last Updated: ${lastUpdated}`; // Only show the date, not the label
                     } else {
                         document.getElementById('lastUpdated').innerHTML = 'No information available';
                     }
