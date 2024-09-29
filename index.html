@@ -62,13 +62,25 @@
 
                     if (result) {
                         document.getElementById('trackingResult').innerHTML = `Status: ${result['Status']}`;
-                        document.getElementById('deliveryDate').innerHTML = `Delivery Date: ${result['Delivery Date'] || 'Not available'}`; // Display delivery date
-                        const commentText = result['Comments'] ? result['Comments'] : 'No comments available';
-                        document.getElementById('comments').innerHTML = `Comments: ${commentText}`;
+                        
+                        // Display Delivery Date only if it exists
+                        if (result['Delivery Date']) {
+                            document.getElementById('deliveryDate').innerHTML = `Delivery Date: ${result['Delivery Date']}`;
+                        } else {
+                            document.getElementById('deliveryDate').innerHTML = ''; // Clear the field if no value
+                        }
+
+                        // Display Comments only if they exist
+                        if (result['Comments']) {
+                            document.getElementById('comments').innerHTML = `Comments: ${result['Comments']}`;
+                        } else {
+                            document.getElementById('comments').innerHTML = ''; // Clear the field if no value
+                        }
+
                     } else {
                         document.getElementById('trackingResult').innerHTML = 'Tracking ID not found.';
-                        document.getElementById('deliveryDate').innerHTML = '';
-                        document.getElementById('comments').innerHTML = '';
+                        document.getElementById('deliveryDate').innerHTML = ''; // Clear in case of error
+                        document.getElementById('comments').innerHTML = ''; // Clear in case of error
                     }
                 })
                 .catch(error => {
