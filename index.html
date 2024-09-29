@@ -10,41 +10,25 @@
     <input type="text" id="trackingIdInput" placeholder="Enter Tracking ID">
     <button id="trackButton">Track</button>
     <p id="trackingResult"></p>
-    <p id="deliveryDate"></p>
-    <p id="comments"></p>
-    <p id="lastUpdated"></p>
+    <p id="deliveryDate"></p> <!-- Delivery Date paragraph -->
+    <p id="comments"></p> <!-- Comments paragraph -->
+    <p id="lastUpdated"></p> <!-- Last Updated paragraph -->
 
     <script>
         document.getElementById('trackButton').onclick = function() {
             const inputId = document.getElementById('trackingIdInput').value.trim();
             const url = 'https://raw.githubusercontent.com/vcsmor/tracking/main/CSVGithub.csv'; // Ensure this is the correct CSV file URL
 
-            console.log('Fetching data from:', url); // Log the URL
-
             fetch(url)
                 .then(response => {
-                    console.log('Response status:', response.status); // Log the response status
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
                     }
-
-                    // Get the Last-Modified date from the response headers
-                    const lastModified = response.headers.get('Last-Modified');
-                    const lastUpdatedElement = document.getElementById('lastUpdated');
-                    if (lastModified) {
-                        lastUpdatedElement.innerHTML = `Last Updated: ${new Date(lastModified).toLocaleString()}`;
-                    } else {
-                        lastUpdatedElement.innerHTML = 'Last Updated: No information available';
-                    }
-
                     return response.text();
                 })
                 .then(data => {
-                    console.log('Data fetched:', data); // Log the raw CSV data
-
                     const rows = data.split('\n').map(row => row.split(','));
                     const headers = rows[0].map(header => header.trim());
-                    console.log('Parsed Headers:', headers); // Log the headers
 
                     const responseData = rows.slice(1).map(row => {
                         const entry = {};
@@ -54,40 +38,44 @@
                         return entry;
                     });
 
-                    console.log('Parsed responseData:', responseData); // Log parsed data
-
                     // Find the result for the input ID
                     const result = responseData.find(entry => entry['Tracking ID'] === inputId); // Ensure 'Tracking ID' matches your CSV header
-                    console.log('Search Result:', result); // Log the search result
 
                     if (result) {
-                        document.getElementById('trackingResult').innerHTML = `Status: ${result['Status']}`;
-                        
-                        // Display Delivery Date only if it exists
+                        document.getElementById('trackingResult').innerHTML = `Status: ${result['Status']}`; // Display the status
+
+                        // Display Delivery Date only if it has a value
                         if (result['Delivery Date']) {
                             document.getElementById('deliveryDate').innerHTML = `Delivery Date: ${result['Delivery Date']}`;
                         } else {
-                            document.getElementById('deliveryDate').innerHTML = ''; // Clear the field if no value
+                            document.getElementById('deliveryDate').innerHTML = ''; // Clear if no value
                         }
 
-                        // Display Comments only if they exist
+                        // Display Comments only if they have a value
                         if (result['Comments']) {
                             document.getElementById('comments').innerHTML = `Comments: ${result['Comments']}`;
                         } else {
-                            document.getElementById('comments').innerHTML = ''; // Clear the field if no value
+                            document.getElementById('comments').innerHTML = ''; // Clear if no value
                         }
-
                     } else {
                         document.getElementById('trackingResult').innerHTML = 'Tracking ID not found.';
-                        document.getElementById('deliveryDate').innerHTML = ''; // Clear in case of error
-                        document.getElementById('comments').innerHTML = ''; // Clear in case of error
+                        document.getElementById('deliveryDate').innerHTML = ''; // Clear Delivery Date if not found
+                        document.getElementById('comments').innerHTML = ''; // Clear Comments if not found
+                    }
+
+                    // Fetch the "Last Updated" value from the first row (E2) and display it
+                    const lastUpdated = rows[1][headers.indexOf('Last Updated')]; // Adjust for column name
+                    if (lastUpdated) {
+                        document.getElementById('lastUpdated').innerHTML = `Last Updated: ${lastUpdated}`;
+                    } else {
+                        document.getElementById('lastUpdated').innerHTML = 'No information available';
                     }
                 })
                 .catch(error => {
                     console.error('Error fetching data:', error);
                     document.getElementById('trackingResult').innerHTML = 'Error retrieving data.';
-                    document.getElementById('comments').innerHTML = '';
                     document.getElementById('deliveryDate').innerHTML = '';
+                    document.getElementById('comments').innerHTML = '';
                     document.getElementById('lastUpdated').innerHTML = '';
                 });
         }
